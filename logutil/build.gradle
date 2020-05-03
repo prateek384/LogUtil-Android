@@ -13,7 +13,6 @@ android {
         targetSdkVersion 29
         versionCode 1
         versionName "1.0"
-
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles 'consumer-rules.pro'
     }
@@ -24,22 +23,40 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
-    flavorDimensions "architecture"
+    flavorDimensions "version"
+
     // multiple flavours. produces the following artifacts: -productionRelease.aar, -sandboxRelease.aar, -productionDebug.aar, -sandboxDebug.aar
     productFlavors {
         production {
-            buildConfigField 'String', 'ENV', '"PRODUCTION"'
+            dimension "version"
         }
         sandbox {
-            buildConfigField 'String', 'ENV', '"SANDBOX"'
+            dimension "version"
         }
     }
 
     // default build flavour
     defaultPublishConfig "productionRelease"
-    // true to publish all flavour artifacts
-    publishNonDefault true
 
+
+}
+
+if (android.productFlavors.size() > 0) {
+    android.libraryVariants.all { variant ->
+        if (variant.name.toLowerCase().contains("debug")) {
+            return
+        }
+
+        def bundleTask = tasks["bundle${name.capitalize()}Aar"]
+
+        artifacts {
+            archives(bundleTask.archivePath) {
+                classifier variant.flavorName
+                builtBy bundleTask
+                name = project.name
+            }
+        }
+    }
 }
 
 
