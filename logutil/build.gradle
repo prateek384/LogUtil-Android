@@ -24,8 +24,24 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+    flavorDimensions "architecture"
+    // multiple flavours. produces the following artifacts: -productionRelease.aar, -sandboxRelease.aar, -productionDebug.aar, -sandboxDebug.aar
+    productFlavors {
+        production {
+            buildConfigField 'String', 'ENV', '"PRODUCTION"'
+        }
+        sandbox {
+            buildConfigField 'String', 'ENV', '"SANDBOX"'
+        }
+    }
+
+    // default build flavour
+    defaultPublishConfig "productionRelease"
+    // true to publish all flavour artifacts
+    publishNonDefault true
 
 }
+
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
